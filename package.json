@@ -1,0 +1,22 @@
+{
+  "name": "thread-print",
+  "version": "1.0.0",
+  "description": "art",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/semateos/thread-print.git"
+  },
+  "author": "Sam Mateosian",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/semateos/thread-print/issues"
+  },
+  "homepage": "https://github.com/semateos/thread-print#readme",
+  "dependencies": {
+    "serialport": "^2.0.6"
+  }
+}
