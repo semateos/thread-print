@@ -5,9 +5,10 @@ var EventEmitter = require('events');
 var util = require('util');
 
 var prompt = require('prompt');
-var SerialPort = require("serialport").SerialPort
+var serialport = require("serialport");
+var SerialPort = serialport.SerialPort;
 
-var portName = "/dev/cu.usbmodem1421";
+var portName = "/dev/cu.usbmodemFD121";
 
 var mmPerRev = 31;
 var stepsPerRev = 800;
@@ -68,7 +69,8 @@ serialPort = new SerialPort(portName, {
     dataBits: 8,
     parity: 'none',
     stopBits: 1,
-    flowControl: false
+    flowControl: false,
+    parser: serialport.parsers.readline('\n')
 });
 
 var writeNextCommand = function(){
@@ -95,35 +97,30 @@ var writeNextCommand = function(){
 
 }
 
-/*
-myEmitter.on('ready', function(){
 
-  console.log('READY');
 
-  //writeNextCommand();
+serialPort.on('data', function(data) {
+
+  var receivedData = data.toString();
+
+  console.log(receivedData);
+
+  if(receivedData.indexOf("READY") != -1){
+
+    //console.log('matches READY');
+
+    myEmitter.emit('ready');
+  }
+
+
 });
-*/
 
 serialPort.on("open", function () {
 
   console.log('open serial communication');
 
   // Listens to incoming data
-  serialPort.on('data', function(data) {
 
-    var receivedData = data.toString();
-
-    console.log(receivedData);
-
-    if(receivedData.indexOf("READY") != -1){
-
-      //console.log('matches READY');
-
-      myEmitter.emit('ready');
-    }
-
-
-  });
 
 
 
@@ -155,7 +152,7 @@ var doPrompt = function(){
 
       myEmitter.on('ready', function(){
 
-        console.log('READY');
+        //console.log('READY');
 
         writeNextCommand();
       });
