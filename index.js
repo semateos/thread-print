@@ -117,7 +117,7 @@ serialPort.on("open", function () {
 
     if(receivedData.indexOf("READY") != -1){
 
-      console.log('matches READY');
+      //console.log('matches READY');
 
       myEmitter.emit('ready');
     }
@@ -159,6 +159,8 @@ var doPrompt = function(){
 
         writeNextCommand();
       });
+
+      writeNextCommand();
 
 
       var input = result['>'];
