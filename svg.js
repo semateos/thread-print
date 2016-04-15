@@ -10,48 +10,54 @@ var strSVGstart = '<?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-
 var pathSVG = '<rect x="130" y= "130" height="320" width="550" id="rect1" fill ="white" stroke="blue" ></rect>';
 var strSVGend = '</svg>';
 
-for(var i = 0; i < paths.length; i++){
 
-  pathSVG += '<path fill="none" id="path-' + i + '" stroke-width="5" stroke="red" d="' + paths[i].d + '" />';
-
-  try{
-
-    var pts = point(paths[i].d);
-
-    var len = pts.length();
-
-    var pointCount = Math.ceil(len / 10);
-
-    //console.log('lengths', len);
-
-    for (var j = 0; j <= pointCount; j++) {
-
-      var pt = pts.at(j / pointCount * len);
-
-      pathSVG += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="5" stroke="none" fill="blue" />';
-    }
-
-  }catch(e){}
-}
 
 var svg = strSVGstart + pathSVG + strSVGend;
 
-console.log(svg);
+//console.log(svg);
 
-/*
-jsdom.env({
-        html : svg,
-        done : function (err, window) {
+// Please note: When loading paper as a normal module installed in node_modules,
+// you would use this instead:
+var paper = require('./dist/paper-core.js');
+var path = require('path');
+var fs = require('fs');
 
-          if(err){
+paper.setup(new paper.Size(2000, 2000));
 
-            console.log('error:', err);
-          }
 
-          var path = window.document.getElementById("path-92");
 
-          console.log('path-92', path);
-        }
+with (paper) {
+
+  for(var i = 0; i < paths.length; i++){
+
+    var item = paper.project.importSVG('<path fill="none" id="path-' + i + '" stroke-width="5" stroke="red" d="' + paths[i].d + '" />');
+
+    //console.log(item.length);
+
+    var segment_size = 10;
+
+    var segments = Math.ceil(item.length/segment_size);
+
+    for(var j = 0; j < segments; j++){
+
+      var point = item.getPointAt(segment_size * j);
+
+      var circle = new Path.Circle({
+          center: point,
+          radius: 5,
+          fillColor: 'blue'
+      });
     }
-);
-*/
+  }
+
+  
+  project.view.translate(new Point(1000, 1000));
+
+  var svg = project.exportSVG({ asString: true });
+  //console.log(svg);
+
+  fs.writeFile(path.resolve('./out.svg'),svg, function (err) {
+      if (err) throw err;
+      console.log('Saved!');
+  });
+}
