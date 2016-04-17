@@ -20,6 +20,8 @@ polargraph.connect(function(err){
 
   polargraph.moveAlongPath(path);
 
+  polargraph.liftPen();
+
   polargraph.start();
 
 });

@@ -20,15 +20,15 @@ var polargraph = {
   mmPerRev: config.mmPerRev,
   stepsPerRev: config.stepsPerRev,
 
-  stepsPerMM: this.stepsPerRev / this.mmPerRev,
-  mmPerStep: this.mmPerRev / this.stepsPerRev,
+  stepsPerMM: config.stepsPerRev / config.mmPerRev,
+  mmPerStep: config.mmPerRev / config.stepsPerRev,
 
   machineWidth: config.machineWidth,
   machineHeight: config.machineHeight,
 
   home: {
-    x:this.machineWidth/2,
-    y:this.machineHeight/2
+    x:config.machineWidth/2,
+    y:config.machineHeight/2
   },
 
   serialPort: new SerialPort(config.portName, {
@@ -55,13 +55,13 @@ var polargraph = {
 
   sendNextCommand: function(){
 
-    if(this.commandIndex < this.commands.length){
+    if(this.commandIndex < this.commandQueue.length){
 
-      var command = commands[commandIndex];
+      var command = this.commandQueue[this.commandIndex];
 
-      commandIndex++;
+      this.commandIndex++;
 
-      serialPort.write(command + "\n", function(err, results) {
+      this.serialPort.write(command + "\n", function(err, results) {
 
         console.log('sent >', command);
 
@@ -121,7 +121,7 @@ var polargraph = {
 
     var command = 'C09,' + steps.l + ',' + steps.r + ',END';
 
-    this.queueCommand(steps);
+    this.queueCommand(command);
   },
 
   //set pen position to home location
@@ -210,7 +210,7 @@ module.exports = polargraph;
 
 
 //console.log('coords', coordsToLength(550,550));
-
+/*
 var path = [{x:600,y:550},{x:600,y:600},{x:550,y:600},{x:550,y:550}];
 
 polargraph.connect(function(err){
@@ -227,3 +227,4 @@ polargraph.connect(function(err){
   polargraph.start();
 
 });
+*/
