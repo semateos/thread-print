@@ -93,6 +93,9 @@ var polargraph = {
   //return step position for each motor
   positionToSteps: function(x,y){
 
+    console.log('positionToSteps', x, y);
+
+
     //left motor line length in steps
     var L = Math.round(Math.hypot(x,y) * this.stepsPerMM);
 
@@ -155,11 +158,6 @@ var polargraph = {
   connect: function(callback){
 
     var self = this;
-
-
-    this.setHomePosition();
-
-    this.liftPen();
 
     //send the next command in the queue when device responds 'ready'
     this.emitter.on('ready', function(){

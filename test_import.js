@@ -2,7 +2,6 @@
 var SVG = require('./SVG.js');
 
 SVG.setup(450,600);
-//SVG.translate(225,300);
 
 var circle = new SVG.paper.Path.Circle({
     center: new SVG.paper.Point(0,0),
@@ -16,7 +15,7 @@ var circle = new SVG.paper.Path.Circle({
     fillColor: 'green'
 });
 
-SVG.importSVGFile('./test_in.svg', function(err, res){
+SVG.importSVGFile('./test_draw.svg', function(err, res){
 
   if(err){
 
