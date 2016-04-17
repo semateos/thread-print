@@ -94,9 +94,11 @@ var SVG = {
 
       copy.flatten(segmentSize);
 
-      //copy.add(paperPath.getPointAt(paperPath.length));
+      //copy.add(paperPath.getPointAt(0));
 
       segments = copy.segments;
+
+      segments.isClosed = true;
     }
 
     return segments;

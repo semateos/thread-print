@@ -133,6 +133,11 @@ var polargraph = {
     this.setPenPosition(this.home.x, this.home.y);
   },
 
+  moveHome: function(){
+
+    this.moveDirect(this.home.x, this.home.y);
+  },
+
   //move on a direct line to position
   moveDirect: function(x,y){
 

@@ -23,6 +23,8 @@ var circle2 = new SVG.paper.Path.Circle({
     fillColor: 'green'
 });
 
+polargraph.setHomePosition();
+
 SVG.importSVGFile('./test_draw.svg', function(err, res){
 
   if(err){
@@ -39,33 +41,45 @@ SVG.importSVGFile('./test_draw.svg', function(err, res){
 
   var paths = SVG.getAllChildren(res);
 
-  for(var i = 0; i < paths.length; i++){
+  for(var i = 1; i < paths.length; i++){
 
     //var item = SVG.importSVGPathString('<path fill="none" stroke-width="2" stroke="blue" d="' + paths[i].d + '" />');
 
     polargraph.liftPen();
 
-    var segments = SVG.getPathSegments(paths[i],2);
+    var segments = SVG.getPathSegments(paths[i],1);
 
     var new_path = [];
+
+    var isClosed = segments.isClosed;
+
+    var first;
 
     for(var j = 0; j < segments.length; j++){
 
       var point = segments[j].point;
 
-      var x = point.x + 325;
-      var y = point.y + 225;
+      point.x += 325;
+      point.y += 250;
 
       if(j == 0){
 
-        polargraph.moveDirect(x,y);
+        first = point;
+
+        polargraph.moveDirect(point.x,point.y);
 
         polargraph.dropPen();
 
       }else{
 
-        polargraph.moveDirect(x,y);
+        polargraph.moveDirect(point.x, point.y);
       }
+
+      if(isClosed && j == segments.length - 1){
+
+        polargraph.moveDirect(first.x,first.y);
+      }
+
     }
   }
 
@@ -75,7 +89,7 @@ SVG.importSVGFile('./test_draw.svg', function(err, res){
 
 });
 
-
+polargraph.moveHome();
 
 
 
