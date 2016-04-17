@@ -27,7 +27,6 @@ var SVG = {
     paper.project.view.translate(new paper.Point(x,y));
   },
 
-
   importSVGFile: function(filePath, callback){
 
     paper.project.importSVG(filePath, {
@@ -47,24 +46,33 @@ var SVG = {
     return paper.project.importSVG(svgPathString);
   },
 
-  getPathSegments: function(paperPath, segmentSize){
 
-    /*
-    var segmentCount = Math.ceil(paperPath.length/segmentSize);
+  getAllChildren: function(object){
 
-    console.log('segmentCount:', segmentCount);
+    /*if(!object){
+      object = paper.project.activeLayer;
+    }*/
 
-    var segments = [];
+    var children = [];
 
-    for(var i = 0; i < segmentCount; i++){
+    if(object && object.children){
 
-      var point = paperPath.getPointAt(segmentSize * i);
+      //console.log(typeof(object.children));
 
-      console.log('point:', point);
+      for(var i = 0; i < object.children.length; i++){
 
-      segments.push(point);
+        children.push(object.children[i]);
+
+        children = children.concat(this.getAllChildren(object.children[i]));
+      }
+
     }
-    */
+
+    return children;
+
+  },
+
+  getPathSegments: function(paperPath, segmentSize){
 
     var segments = [];
 
@@ -105,7 +113,6 @@ var SVG = {
     });
 
   }
-
 
 }
 

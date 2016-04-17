@@ -27,7 +27,7 @@ SVG.importSVGFile('./test_in.svg', function(err, res){
 
   //console.log('result', res.children);
 
-  paths = res.children;
+  var paths = SVG.getAllChildren(res);
 
   for(var i = 0; i < paths.length; i++){
 

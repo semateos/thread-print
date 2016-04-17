@@ -1,0 +1,9 @@
+{
+  "portName": "/dev/cu.usbmodemFD121",
+  "mmPerRev": 31,
+  "stepsPerRev": 800,
+  "machineWidth": 1100,
+  "machineHeight": 1100,
+  "penUpPosition": 120,
+  "penDownPosition": 90  
+}
