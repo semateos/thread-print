@@ -13,11 +13,11 @@ var SVG = require('./SVG.js');
 
 var paper = SVG.paper;
 
-SVG.setup(450,600);
+SVG.setup(1100,1100);
 
 var scale = 0.5;
 
-var home = new SVG.paper.Point(250, 325);
+var home = new SVG.paper.Point(550, 550);
 
 
 var circle1 = new SVG.paper.Path.Circle({
@@ -33,7 +33,7 @@ var circle2 = new SVG.paper.Path.Circle({
 });
 
 var circle3 = new SVG.paper.Path.Circle({
-    center: new SVG.paper.Point(450,600),
+    center: new SVG.paper.Point(1100,1100),
     radius: 3,
     fillColor: 'red'
 });
@@ -47,70 +47,12 @@ var url = 'mongodb://psylocke-2.local:27017/thread';
 
 var mongodb;
 
-var drawPaths = [];
-
-MongoClient.connect(url, function(err, db) {
-
-  assert.equal(null, err);
-
-  console.log("Connected correctly to server.");
-
-  mongodb = db;
-
-  var paths = db.collection('paths');
-
-  var top = 0;
-
-  //var filter = {top: {$gt: top}};
-
-  var filter = {};
-
-  paths.find(filter).toArray(function(err, items){
-
-    if(err){
-
-      console.log(err);
-    }
-
-    console.log('found paths', items);
-
-    drawPaths = [];
-
-    for(var i = 0; i < items.length; i++){
-
-      var item = SVG.importSVGPathString('<path fill="none" stroke-width="2" stroke="red" d="' + items[i].d + '" />');
-
-      var flatPath = SVG.flatten(item, scale);
-
-      item.remove();
-
-      flatPath.position.x *= scale;
-      flatPath.position.y *= scale;
-
-      flatPath.scale(scale);
-
-      flatPath.translate(home);
-
-      drawPaths.push(flatPath);
-
-    }
-
-    SVG.export('./test_out.svg');
-
-    drawPaths(drawPaths);
-
-    polargraph.moveHome();
-
-    db.close();
-
-  });
+var pathsToDraw = [];
 
 
-});
+var drawPaths = function(paths){
 
-
-
-function drawPaths(paths){
+  polargraph.liftPen();
 
   for(var i = 0; i < paths.length; i++){
 
@@ -144,8 +86,75 @@ function drawPaths(paths){
         polargraph.moveDirect(first.x,first.y);
       }
     }
+
+    polargraph.liftPen();
   }
 }
+
+var mongoConnect = function(){
+
+  MongoClient.connect(url, function(err, db) {
+
+    assert.equal(null, err);
+
+    console.log("Connected correctly to server.");
+
+    mongodb = db;
+
+    var paths = db.collection('paths');
+
+    var top = 0;
+
+    //var filter = {top: {$gt: top}};
+
+    var filter = {};
+
+    paths.find(filter).toArray(function(err, items){
+
+      if(err){
+
+        console.log(err);
+      }
+
+      console.log('found paths', items);
+
+      pathsToDraw = [];
+
+      for(var i = 0; i < items.length; i++){
+
+        var item = SVG.importSVGPathString('<path fill="none" stroke-width="2" stroke="red" d="' + items[i].d + '" />');
+
+        var flatPath = SVG.flatten(item, scale);
+
+        item.remove();
+
+        flatPath.position.x *= scale;
+        flatPath.position.y *= scale;
+
+        flatPath.scale(scale);
+
+        flatPath.translate(home);
+
+        pathsToDraw.push(flatPath);
+
+      }
+
+      //SVG.export('./test_out.svg');
+
+      drawPaths(pathsToDraw);
+
+      polargraph.moveHome();
+
+      db.close();
+
+    });
+
+  });
+
+}
+
+
+
 
 
 
@@ -241,9 +250,11 @@ polargraph.connect(function(err){
     return console.log('Error connecting: ', err.message);
   }
 
-  //polargraph.setHomePosition();
+  polargraph.setHomePosition();
 
   polargraph.start();
+
+  mongoConnect();
 
 });
 
