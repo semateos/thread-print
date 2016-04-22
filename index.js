@@ -60,13 +60,17 @@ var drawPaths = function(paths){
 
     var segments = path.segments;
 
+    //console.log(segments);
+
     var new_path = [];
 
     var isClosed = path.isClosed;
 
     for(var j = 0; j < segments.length; j++){
 
-      var point = segments[j].point;
+      var point = path.localToGlobal(segments[j].point);
+
+      //console.log('point', point.x,point.y);
 
       if(j == 0){
 
@@ -116,7 +120,7 @@ var mongoConnect = function(){
         console.log(err);
       }
 
-      console.log('found paths', items);
+      //console.log('found paths', items);
 
       pathsToDraw = [];
 
@@ -155,6 +159,7 @@ var mongoConnect = function(){
 
 
 
+mongoConnect();
 
 
 
@@ -254,7 +259,7 @@ polargraph.connect(function(err){
 
   polargraph.start();
 
-  mongoConnect();
+  //mongoConnect();
 
 });
 
