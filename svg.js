@@ -72,9 +72,11 @@ var SVG = {
 
   },
 
-  getPathSegments: function(paperPath, segmentSize){
+  flatten: function(paperPath, segmentSize){
 
     var segments = [];
+
+    var ret = paperPath;
 
     if(paperPath.flatten){
 
@@ -84,9 +86,7 @@ var SVG = {
 
       copy.add(paperPath.getPointAt(paperPath.length));
 
-      segments = copy.segments;
-
-      copy.remove();
+      ret = copy;
 
     }else if(paperPath.toPath){
 
@@ -96,10 +96,22 @@ var SVG = {
 
       //copy.add(paperPath.getPointAt(0));
 
-      segments = copy.segments;
+      ret = copy;
 
-      segments.isClosed = true;
+      ret.isClosed = true;
+
     }
+
+    return ret;
+  },
+
+  getPathSegments: function(paperPath, segmentSize){
+
+    var flatPath = this.flatten(paperPath, segmentSize);
+
+    var segments = flatPath.segments;
+
+    segments.isClosed = flatPath.isClosed;
 
     return segments;
   },

@@ -9,10 +9,45 @@ prompt.message = '';
 prompt.delimiter = '';
 
 
+var SVG = require('./SVG.js');
+
+var paper = SVG.paper;
+
+SVG.setup(450,600);
+
+var scale = 0.5;
+
+var home = new SVG.paper.Point(250, 325);
+
+
+var circle1 = new SVG.paper.Path.Circle({
+    center: new SVG.paper.Point(0,0),
+    radius: 3,
+    fillColor: 'red'
+});
+
+var circle2 = new SVG.paper.Path.Circle({
+    center: home,
+    radius: 3,
+    fillColor: 'red'
+});
+
+var circle3 = new SVG.paper.Path.Circle({
+    center: new SVG.paper.Point(450,600),
+    radius: 3,
+    fillColor: 'red'
+});
+
+
+
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 
 var url = 'mongodb://127.0.0.1:3002/meteor';
+
+var mongodb;
+
+var drawPaths = [];
 
 MongoClient.connect(url, function(err, db) {
 
@@ -20,45 +55,101 @@ MongoClient.connect(url, function(err, db) {
 
   console.log("Connected correctly to server.");
 
+  mongodb = db;
+
   var paths = db.collection('paths');
 
-  var top = 5000;
+  var top = 0;
 
-  paths.find({top: {$gt: top}}).limit(10).toArray(function(err, items){
+  //var filter = {top: {$gt: top}};
+
+  var filter = {};
+
+  paths.find(filter).toArray(function(err, items){
 
     if(err){
 
       console.log(err);
     }
 
-
     console.log('found paths', items);
+
+    drawPaths = [];
+
+    for(var i = 0; i < items.length; i++){
+
+      var item = SVG.importSVGPathString('<path fill="none" stroke-width="2" stroke="red" d="' + items[i].d + '" />');
+
+      var flatPath = SVG.flatten(item, scale);
+
+      item.remove();
+
+      flatPath.position.x *= scale;
+      flatPath.position.y *= scale;
+
+      flatPath.scale(scale);
+
+      flatPath.translate(home);
+
+      drawPaths.push(flatPath);
+
+    }
+
+    SVG.export('./test_out.svg');
+
+    db.close();
+
   });
 
 
-
-  db.close();
 });
 
 
 
-var SVG = require('./SVG.js');
+function drawPaths(paths){
 
-SVG.setup(450,600);
+  for(var i = 0; i < paths.length; i++){
 
-var circle1 = new SVG.paper.Path.Circle({
-    center: new SVG.paper.Point(0,0),
-    radius: 1,
-    fillColor: 'green'
-});
+    var path = paths[i];
 
-var circle2 = new SVG.paper.Path.Circle({
-    center: new SVG.paper.Point(450,600),
-    radius: 1,
-    fillColor: 'green'
-});
+    var segments = path.segments;
 
-polargraph.setHomePosition();
+    var new_path = [];
+
+    var isClosed = path.isClosed;
+
+    for(var j = 0; j < segments.length; j++){
+
+      var point = segments[j].point;
+
+      if(j == 0){
+
+        first = point;
+
+        polargraph.moveDirect(point.x,point.y);
+
+        polargraph.dropPen();
+
+      }else{
+
+        polargraph.moveDirect(point.x, point.y);
+      }
+
+      if(isClosed && j == segments.length - 1){
+
+        polargraph.moveDirect(first.x,first.y);
+      }
+
+    }
+
+  }
+
+
+}
+
+
+
+
 
 /*
 SVG.importSVGFile('./test_draw.svg', function(err, res){
@@ -150,6 +241,7 @@ polargraph.connect(function(err){
     return console.log('Error connecting: ', err.message);
   }
 
+  //polargraph.setHomePosition();
 
   polargraph.start();
 
@@ -166,6 +258,7 @@ var doPrompt = function(){
 
     if(!err){
 
+      mongodb.close();
 
       var input = result['>'];
 
