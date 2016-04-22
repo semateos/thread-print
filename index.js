@@ -99,6 +99,8 @@ MongoClient.connect(url, function(err, db) {
 
     drawPaths(drawPaths);
 
+    polargraph.moveHome();
+
     db.close();
 
   });
