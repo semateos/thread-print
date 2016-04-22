@@ -43,7 +43,7 @@ var circle3 = new SVG.paper.Path.Circle({
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 
-var url = 'mongodb://127.0.0.1:3002/meteor';
+var url = 'mongodb://psylocke-2.local:27017/thread';
 
 var mongodb;
 
@@ -97,6 +97,8 @@ MongoClient.connect(url, function(err, db) {
 
     SVG.export('./test_out.svg');
 
+    drawPaths(drawPaths);
+
     db.close();
 
   });
@@ -139,12 +141,8 @@ function drawPaths(paths){
 
         polargraph.moveDirect(first.x,first.y);
       }
-
     }
-
   }
-
-
 }
 
 
