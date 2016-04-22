@@ -1,11 +1,46 @@
 
 console.log('Hola!');
 
+
 var prompt = require('prompt');
 var polargraph = require('./polargraph.js');
 
 prompt.message = '';
 prompt.delimiter = '';
+
+
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
+
+var url = 'mongodb://127.0.0.1:3002/meteor';
+
+MongoClient.connect(url, function(err, db) {
+
+  assert.equal(null, err);
+
+  console.log("Connected correctly to server.");
+
+  var paths = db.collection('paths');
+
+  var top = 5000;
+
+  paths.find({top: {$gt: top}}).limit(10).toArray(function(err, items){
+
+    if(err){
+
+      console.log(err);
+    }
+
+
+    console.log('found paths', items);
+  });
+
+
+
+  db.close();
+});
+
+
 
 var SVG = require('./SVG.js');
 
@@ -25,6 +60,7 @@ var circle2 = new SVG.paper.Path.Circle({
 
 polargraph.setHomePosition();
 
+/*
 SVG.importSVGFile('./test_draw.svg', function(err, res){
 
   if(err){
@@ -85,7 +121,7 @@ SVG.importSVGFile('./test_draw.svg', function(err, res){
 
   polargraph.liftPen();
 
-  console.log('QUEUE', polargraph.commandQueue);
+  //console.log('QUEUE', polargraph.commandQueue);
 
 });
 

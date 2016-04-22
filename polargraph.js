@@ -93,7 +93,7 @@ var polargraph = {
   //return step position for each motor
   positionToSteps: function(x,y){
 
-    console.log('positionToSteps', x, y);
+    //console.log('positionToSteps', x, y);
 
 
     //left motor line length in steps
@@ -196,11 +196,19 @@ var polargraph = {
     });
 
     //open serial connection and call the callback
-    this.serialPort.open(function(err){
+
+    try{
+
+      this.serialPort.open(function(err){
+
+        callback(err);
+
+      });
+
+    }catch(e){
 
       callback(err);
-
-    });
+    }
 
   }
 

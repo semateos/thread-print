@@ -17,8 +17,9 @@
   },
   "homepage": "https://github.com/semateos/thread-print#readme",
   "dependencies": {
-    "paper": "^0.9.25",
     "jsdom": "^8.3.0",
+    "mongodb": "^2.1.16",
+    "paper": "^0.9.25",
     "point-at-length": "^1.0.1",
     "prompt": "^1.0.0",
     "serialport": "^2.0.6"
