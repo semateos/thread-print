@@ -2,6 +2,7 @@
 
 var serialport = require("serialport");
 var SerialPort = serialport.SerialPort;
+var Queue = require('queuejs');
 
 var config = require('./config.json');
 
@@ -42,24 +43,22 @@ var polargraph = {
 
   emitter: new MyEmitter(),
 
-  commandQueue: [],
-
-  commandIndex: 0,
+  commandQueue: new Queue(),
 
   paused: true,
 
   queueCommand: function(commandString){
 
-    this.commandQueue.push(commandString);
+    this.commandQueue.enq(commandString);
+
+    console.log('queue length:', this.commandQueue.size());
   },
 
   sendNextCommand: function(){
 
-    if(this.commandIndex < this.commandQueue.length){
+    if(this.commandQueue.size() > 0){
 
-      var command = this.commandQueue[this.commandIndex];
-
-      this.commandIndex++;
+      var command = this.commandQueue.deq();
 
       this.serialPort.write(command + "\n", function(err, results) {
 
