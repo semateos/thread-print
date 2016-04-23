@@ -89,7 +89,7 @@ var drawPath = function(path){
 
     if(isClosed && j == segments.length - 1){
 
-      polargraph.moveDirect(first.x,first.y);
+      //polargraph.moveDirect(first.x,first.y);
     }
   }
 
@@ -196,7 +196,7 @@ var mongoConnect = function(){
 
 
 
-mongoConnect();
+//mongoConnect();
 
 
 
@@ -296,7 +296,7 @@ polargraph.connect(function(err){
 
   polargraph.start();
 
-  //mongoConnect();
+  mongoConnect();
 
 });
 
