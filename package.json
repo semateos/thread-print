@@ -22,6 +22,7 @@
     "paper": "^0.9.25",
     "point-at-length": "^1.0.1",
     "prompt": "^1.0.0",
+    "queuejs": "^0.1.0",
     "serialport": "^2.0.6"
   }
 }

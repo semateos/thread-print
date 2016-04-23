@@ -4,6 +4,9 @@ console.log('Hola!');
 
 var prompt = require('prompt');
 var polargraph = require('./polargraph.js');
+var Queue = require('queuejs');
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
 
 prompt.message = '';
 prompt.delimiter = '';
@@ -40,89 +43,90 @@ var circle3 = new SVG.paper.Path.Circle({
 
 
 
-var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
 
-var url = 'mongodb://psylocke-2.local:27017/thread';
+
+var mongoServerUrl = 'mongodb://psylocke-2.local:27017/thread';
 
 var mongodb;
 
-var pathsToDraw = [];
+//var pathsToDraw = new Queue();
+
+var pathsCollection;
 
 
-var drawPaths = function(paths){
+var drawPath = function(path){
+
+  console.log('drawing path');
 
   polargraph.liftPen();
 
-  for(var i = 0; i < paths.length; i++){
+  var segments = path.segments;
 
-    var path = paths[i];
+  //console.log(segments);
 
-    var segments = path.segments;
+  var new_path = [];
 
-    //console.log(segments);
+  var isClosed = path.isClosed;
 
-    var new_path = [];
+  for(var j = 0; j < segments.length; j++){
 
-    var isClosed = path.isClosed;
+    var point = path.localToGlobal(segments[j].point);
 
-    for(var j = 0; j < segments.length; j++){
+    //console.log('point', point.x,point.y);
 
-      var point = path.localToGlobal(segments[j].point);
+    if(j == 0){
 
-      //console.log('point', point.x,point.y);
+      first = point;
 
-      if(j == 0){
+      polargraph.moveDirect(point.x,point.y);
 
-        first = point;
+      polargraph.dropPen();
 
-        polargraph.moveDirect(point.x,point.y);
+    }else{
 
-        polargraph.dropPen();
-
-      }else{
-
-        polargraph.moveDirect(point.x, point.y);
-      }
-
-      if(isClosed && j == segments.length - 1){
-
-        polargraph.moveDirect(first.x,first.y);
-      }
+      polargraph.moveDirect(point.x, point.y);
     }
 
-    polargraph.liftPen();
+    if(isClosed && j == segments.length - 1){
+
+      polargraph.moveDirect(first.x,first.y);
+    }
   }
+
+  polargraph.liftPen();
 }
 
-var mongoConnect = function(){
 
-  MongoClient.connect(url, function(err, db) {
+var lastCreated = false;
 
-    assert.equal(null, err);
+var getPathsBlock = function(){
 
-    console.log("Connected correctly to server.");
+  var filter = {};
 
-    mongodb = db;
+  if(lastCreated){
 
-    var paths = db.collection('paths');
+    filter = {"created":{$gt:lastCreated}}
+  }
 
-    var top = 0;
+  pathsCollection.find(filter).sort({"created":1}).limit(10).toArray(function(err, items){
 
-    //var filter = {top: {$gt: top}};
+    if(err){
 
-    var filter = {};
+      console.log(err);
+    }
 
-    paths.find(filter).toArray(function(err, items){
+    if(items && items.length){
 
-      if(err){
+      //console.log('found items:', items.length);
 
-        console.log(err);
-      }
+      lastCreated = items[items.length - 1].created;
+
+
+      console.log('found items:', items.length, lastCreated);
 
       //console.log('found paths', items);
 
-      pathsToDraw = [];
+      //pathsToDraw = [];
 
       for(var i = 0; i < items.length; i++){
 
@@ -139,19 +143,52 @@ var mongoConnect = function(){
 
         flatPath.translate(home);
 
-        pathsToDraw.push(flatPath);
+        drawPath(flatPath);
+
+        //pathsToDraw.enq(flatPath);
 
       }
 
-      //SVG.export('./test_out.svg');
+    }else{
 
-      drawPaths(pathsToDraw);
+      console.log('no items found, going home...');
 
       polargraph.moveHome();
 
-      db.close();
+      //SVG.export('./test_out.svg');
+    }
 
-    });
+
+
+    //SVG.expogit strt('./test_out.svg');
+
+    //drawPaths(pathsToDraw);
+
+    //polargraph.moveHome();
+
+    //db.close();
+
+  });
+
+}
+
+
+
+
+
+var mongoConnect = function(){
+
+  MongoClient.connect(mongoServerUrl, function(err, db) {
+
+    assert.equal(null, err);
+
+    console.log("Connected correctly to server.");
+
+    mongodb = db;
+
+    pathsCollection = db.collection('paths');
+
+    var interval = setInterval(getPathsBlock, 1000);
 
   });
 
