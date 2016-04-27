@@ -18,7 +18,7 @@ var paper = SVG.paper;
 
 SVG.setup(1100,1100);
 
-var scale = 0.5;
+var scale = 0.3;
 
 var home = new SVG.paper.Point(550, 550);
 
@@ -113,6 +113,8 @@ var getPathsBlock = function(){
     if(err){
 
       console.log(err);
+
+      mongoConnect();
     }
 
     if(items && items.length){
@@ -174,9 +176,12 @@ var getPathsBlock = function(){
 
 
 
+var interval;
 
 
 var mongoConnect = function(){
+
+  console.log("attempting mongo connection");
 
   MongoClient.connect(mongoServerUrl, function(err, db) {
 
@@ -188,7 +193,12 @@ var mongoConnect = function(){
 
     pathsCollection = db.collection('paths');
 
-    var interval = setInterval(getPathsBlock, 1000);
+    if(interval){
+
+      clearInterval(interval);
+    }
+
+    interval = setInterval(getPathsBlock, 1000);
 
   });
 

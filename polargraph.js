@@ -32,6 +32,13 @@ var polargraph = {
     y:config.machineHeight/2
   },
 
+  bounds: {
+    top: (config.machineHeight - config.paperHeight) / 2,
+    left: (config.machineWidth - config.paperWidth) / 2,
+    bottom: (config.machineHeight - config.paperHeight) / 2 + config.paperHeight,
+    right: (config.machineWidth - config.paperWidth) / 2 + config.paperWidth
+  },
+
   serialPort: new SerialPort(config.portName, {
     baudrate: 57600,
     dataBits: 8,
@@ -140,9 +147,21 @@ var polargraph = {
   //move on a direct line to position
   moveDirect: function(x,y){
 
-    var lengths = this.positionToSteps(x,y);
+    if( (x >= this.bounds.left) && (x <= this.bounds.right) &&
+        (y >= this.bounds.top) && (y <= this.bounds.bottom) ) {
 
-    this.queueCommand('C17,' + lengths.l + ',' + lengths.r + ',2,END');
+        var lengths = this.positionToSteps(x,y);
+
+        this.queueCommand('C17,' + lengths.l + ',' + lengths.r + ',2,END');
+
+        return true;
+
+    }else{
+
+      return false;
+
+      console.log('move point out of bounds:',x,y);
+    }
   },
 
   //takes an array of points sets move commands for each point

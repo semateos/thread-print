@@ -4,6 +4,8 @@
   "stepsPerRev": 800,
   "machineWidth": 1100,
   "machineHeight": 1100,
+  "paperWidth": 458,
+  "paperHeight": 610,
   "penUpPosition": 120,
-  "penDownPosition": 90  
+  "penDownPosition": 90
 }
