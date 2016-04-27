@@ -18,7 +18,7 @@ var paper = SVG.paper;
 
 SVG.setup(1100,1100);
 
-var scale = 0.3;
+var scale = 0.2;
 
 var home = new SVG.paper.Point(550, 550);
 
@@ -155,7 +155,7 @@ var getPathsBlock = function(){
 
       console.log('no items found, going home...');
 
-      polargraph.moveHome();
+      //polargraph.moveHome();
 
       //SVG.export('./test_out.svg');
     }
@@ -321,7 +321,8 @@ var doPrompt = function(){
 
     if(!err){
 
-      mongodb.close();
+      //mongodb.close();
+      polargraph.moveHome();
 
       var input = result['>'];
 
